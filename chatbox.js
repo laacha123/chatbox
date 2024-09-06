@@ -108,10 +108,10 @@ document.head.appendChild(styleSheet);
 
 // Create chat box HTML
 const chatBoxHTML = `
-<div class="chat-icon" id="chatIcon">
+<div class="chat-icon" id="chatIcon" style="z-index: 1000;">
     💬
 </div>
-<div class="chat-box" id="chatBox">
+<div class="chat-box" id="chatBox" style="z-index: 1000;">
     <div class="chat-header">
         <h3>Chat with us</h3>
         <span class="close-chat" id="closeChat">x</span>
