@@ -1,6 +1,8 @@
 // Extract the api_key from the script's src URL
 const scriptUrl = new URL(document.currentScript.src);
 const client_key = scriptUrl.searchParams.get("api_key");
+console.log("Extracted API Key from URL:", client_key);
+
 
 // Create the CSS styles and append to the document head
 const styles = `
