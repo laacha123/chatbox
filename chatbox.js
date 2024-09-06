@@ -1,8 +1,9 @@
-// Extract the api_key from the script's src URL
-const scriptUrl = new URL(document.currentScript.src);
-const client_key = scriptUrl.searchParams.get("api_key");
-console.log("Extracted API Key from URL:", client_key);
-
+// Ensure the API key is defined
+if (typeof client_key === 'undefined' || client_key === null) {
+    console.error('API key is not defined! Please ensure the api_key is set in the HTML.');
+} else {
+    console.log("API Key:", client_key);
+}
 
 // Create the CSS styles and append to the document head
 const styles = `
@@ -141,23 +142,20 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('chatBox').style.display = 'none';
     });
 
-    // Initialize Socket.IO connection with the api_key included in the headers
+    // Initialize Socket.IO connection with the api_key included in the query string
     const socket = io('http://34.42.49.118:8080/', {
         withCredentials: true,
-        extraHeaders: {
-            'api_key': client_key  // Send api_key as a custom header
+        query: {
+            api_key: client_key  // Send api_key via query string
         }
     });
 
-    let chatHistory = '';
-
-    // Log socket connection and disconnection
     socket.on('connect', function() {
-        console.log("Connected to server");
+        console.log("Connected to server with API Key:", client_key);
     });
 
-    socket.on('disconnect', function() {
-        console.log("Disconnected from server");
+    socket.on('disconnect', function(reason) {
+        console.log("Disconnected from server. Reason:", reason);
     });
 
     document.getElementById('sendBtn').addEventListener('click', function() {
@@ -173,15 +171,13 @@ document.addEventListener('DOMContentLoaded', function() {
     socket.on('bot_message', function(data) {
         const message = data.message;
         displayMessage('Bot', message);
-        chatHistory += `Bot: ${message}\n`;
     });
 
     function sendMessage() {
         const userInput = document.getElementById('userInput').value;
         if (userInput.trim() !== '') {
             displayMessage('You', userInput);
-            chatHistory += `User: ${userInput}\n`;
-            socket.emit('user_message', { message: userInput, history: chatHistory });
+            socket.emit('user_message', { message: userInput });
             document.getElementById('userInput').value = '';
         }
     }
@@ -189,7 +185,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function displayMessage(sender, message) {
         const chatContent = document.getElementById('chatContent');
         const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
         messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
         chatContent.appendChild(messageElement);
         chatContent.scrollTop = chatContent.scrollHeight;
